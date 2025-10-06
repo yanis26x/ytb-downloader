@@ -32,7 +32,7 @@ app.use(express.static(__dirname));
 app.get("/", (_req, res) => {
   res
     .type("text")
-    .send("✅ YTB Downloader API\nUtilise /info?url=... ou /download?url=...&format=mp4|mp3");
+    .send("YTB Downloader API\nUtilise /info?url=... ou /download?url=...&format=mp4|mp3");
 });
 
 // === Fonction erreur courte ===
