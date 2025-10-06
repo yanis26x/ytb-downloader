@@ -110,7 +110,7 @@ if (format === "mp4") {
       "-N", "4",
       "-f", "ba/b",
       "-P", tmpDir,
-      "-o", "%(title)s.%(ext)s", // ✅ corrigé ici
+      "-o", "%(title)s.%(ext)s",
       "-x", "--audio-format", "mp3",
       "--audio-quality", "192K",
       "--print", "after_move:filepath",
@@ -168,10 +168,10 @@ if (format === "mp4") {
 // === Lancement du serveur ===
 const PORT = process.env.PORT || 2626;
 app.listen(PORT, () => {
-  console.log(`✅ Serveur prêt sur http://localhost:${PORT}`);
+  console.log(`u can go http://localhost:${PORT}`);
   console.log(
     HAS_YT_EXE
-      ? "yt-dlp.exe détecté ✔️"
-      : "⚠️ yt-dlp.exe non trouvé — fallback via python -m yt_dlp"
+      ? "yt-dlp.exe détecté!"
+      : "yt-dlp.exe non trouvé — fallback via python -m yt_dlp"
   );
 });
