@@ -1,0 +1,12 @@
+{
+  "name": "ytb-downloader",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "nanoid": "^5.0.7"
+  }
+}

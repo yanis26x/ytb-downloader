@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>YTB Downloader — @yanis26x</title>
+  <style>
+    :root {
+      --bg:#000; --card:#0c0c0c; --text:#fff; --sub:#9CA3AF;
+      --blue:#3B82F6; --border:#1a1a1a; --ok:#22c55e; --err:#ef4444;
+    }
+    *{box-sizing:border-box;scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:var(--bg);
+      color:var(--text);
+      font:18px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,sans-serif;
+      padding:60px 20px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+    }
+
+    .wrap{width:min(1100px,98vw)}
+
+    header{
+      margin-bottom:28px;
+      text-align:left;
+    }
+
+    .brand{
+      margin:0;
+      font-weight:900;
+      letter-spacing:.5px;
+      color:#fff;
+      font-size: clamp(38px, 6vw, 56px);
+      line-height:1.15;
+    }
+
+    .byline{
+      margin-top:8px;
+      font-weight:800;
+      letter-spacing:.2px;
+      color:var(--blue);
+      font-size: clamp(20px, 3vw, 26px);
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:40px;
+      box-shadow:0 0 40px rgba(0,0,0,.4);
+    }
+
+    .row{display:flex; gap:16px; margin-bottom:20px}
+    .row>*{flex:1}
+
+    input,select,button{
+      font:inherit;
+      padding:16px 18px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#111;
+      color:var(--text);
+      transition:.2s;
+      font-size:1rem;
+    }
+
+    input::placeholder{color:#6b7280}
+    input:focus,select:focus{outline:1px solid var(--blue)}
+    button{
+      background:var(--blue);
+      border:none;
+      font-weight:800;
+      cursor:pointer;
+      font-size:1rem;
+      transition:.2s;
+    }
+    button:hover{filter:brightness(1.1)}
+
+    .two{display:flex; gap:16px; margin-bottom:20px}
+
+    .info{
+      display:grid;
+      grid-template-columns:280px 1fr;
+      gap:24px;
+      align-items:start;
+      background:#0f0f0f;
+      border:1px solid #1f1f1f;
+      border-radius:20px;
+      padding:22px;
+      margin-top:20px;
+    }
+
+    .thumb{
+      width:100%;
+      aspect-ratio:16/9;
+      object-fit:cover;
+      border-radius:14px;
+      border:1px solid #1a1a1a;
+    }
+
+    .title{
+      font-weight:800;
+      margin:0 0 10px;
+      color:#e5e7eb;
+      font-size:1.3rem;
+    }
+
+    .meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .badge{
+      background:#111827;
+      border:1px solid #1f2937;
+      border-radius:999px;
+      padding:.4rem .8rem;
+      font-size:.9rem;
+      color:#cbd5e1;
+    }
+
+    .label{color:var(--sub); font-size:1rem}
+    .loader{display:none; margin-top:12px; color:var(--blue); font-weight:700; font-size:1.1rem;}
+
+    .toast{
+      position:fixed;
+      right:24px;
+      bottom:24px;
+      background:#0b0b0b;
+      border:1px solid #1f1f1f;
+      color:#fff;
+      padding:14px 16px;
+      border-radius:14px;
+      box-shadow:0 10px 30px rgba(0,0,0,.45);
+      display:none;
+      font-size:1rem;
+    }
+
+    footer{
+      margin-top:20px;
+      color:var(--sub);
+      font-size:1rem;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1 class="brand">YTB Downloader</h1>
+      <div class="byline">@yanis26x</div>
+    </header>
+
+    <div class="card">
+      <div class="row">
+        <input id="url" placeholder="Paste a YouTube URL (playlist params auto-removed)" />
+      </div>
+
+      <div class="two">
+        <select id="format">
+          <option value="mp4">🎥 MP4</option>
+          <option value="mp3">🎵 MP3</option>
+        </select>
+        <button id="btnDL">Download</button>
+      </div>
+
+      <div id="loader" class="loader">⏳ Loading…</div>
+
+      <section class="info" id="info">
+        <img class="thumb" id="thumb" alt="">
+        <div>
+          <h2 class="title" id="vtitle">No video selected</h2>
+          <div class="meta">
+            <span class="badge" id="vuploader">Channel —</span>
+            <span class="badge" id="vduration">Duration —</span>
+            <span class="badge" id="vbest">Quality —</span>
+          </div>
+          <div class="label" id="vhint">Paste a URL to preview details.</div>
+        </div>
+      </section>
+
+      <footer>Skittles got me feeling tranquil, they're so relieving</footer>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API = "";
+    const $ = (id) => document.getElementById(id);
+    const urlInput = $("url"), fmt=$("format"), btnDL=$("btnDL"), loader=$("loader");
+    const thumb=$("thumb"),vtitle=$("vtitle"),vuploader=$("vuploader"),vduration=$("vduration"),vbest=$("vbest"),vhint=$("vhint"),toast=$("toast");
+
+    const showToast=(msg,ok=false)=>{
+      toast.textContent=msg;
+      toast.style.display="block";
+      toast.style.borderColor=ok?"rgba(34,197,94,.5)":"rgba(239,68,68,.5)";
+      toast.style.boxShadow="none";
+      setTimeout(()=>toast.style.display="none",2500);
+    };
+
+    const normalizeUrl=(raw)=>{
+      try{
+        const u=new URL(raw);
+        ["list","start_radio","pp","si","index","t"].forEach(k=>u.searchParams.delete(k));
+        return u.toString();
+      }catch{return raw.trim();}
+    };
+
+    const fmtDuration=(sec)=>{
+      if(!sec&&sec!==0)return"—";
+      sec=Math.floor(sec);
+      const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;
+      return h>0?`${h}h ${m}m ${s}s`:`${m}m ${s}s`;
+    };
+    const pickThumb=(list=[])=>(list.at(-1)?.url||list[0]?.url||"");
+
+    let tDeb=null;
+    urlInput.addEventListener("input",()=>{
+      clearTimeout(tDeb);
+      tDeb=setTimeout(fetchInfo,450);
+    });
+
+    async function fetchInfo(){
+      const url=normalizeUrl(urlInput.value);
+      if(!url){
+        thumb.src="";vtitle.textContent="Aucune vidéo";
+        vuploader.textContent="Auteur —";vduration.textContent="Durée —";vbest.textContent="Qualité —";
+        vhint.textContent="Colle une URL pour voir les détails.";return;
+      }
+      loader.style.display="block";
+      vhint.textContent="Analyse de la vidéo…";
+      try{
+        const r=await fetch(`${API}/info?url=${encodeURIComponent(url)}`);
+        if(!r.ok)throw new Error(await r.text());
+        const data=await r.json();
+        vtitle.textContent=data.title||"Sans titre";
+        vuploader.textContent=data.uploader?`Auteur — ${data.uploader}`:"Auteur —";
+        vduration.textContent=`Durée — ${fmtDuration(data.duration)}`;
+        const best=(data.formats||[]).filter(f=>f.height).sort((a,b)=>(b.height||0)-(a.height||0))[0];
+        vbest.textContent=`Qualité — ${best?(best.height+'p'):'—'}`;
+        const th=pickThumb(data.thumbnails||[]);
+        if(th)thumb.src=th;
+        vhint.textContent="Prêt à télécharger.";
+        showToast("Infos mises à jour ✔",true);
+      }catch{
+        vhint.textContent="Impossible de lire les infos (URL invalide ?)";
+        showToast("Erreur d’infos",false);
+      }finally{loader.style.display="none";}
+    }
+
+    btnDL.onclick=async()=>{
+      const url=normalizeUrl(urlInput.value);
+      if(!url)return showToast("Mets une URL d’abord");
+      loader.textContent="⬇️ Downloading…";loader.style.display="block";
+      try{
+        const r=await fetch(`${API}/download?url=${encodeURIComponent(url)}&format=${fmt.value}`);
+        if(!r.ok)throw new Error(await r.text());
+        const blob=await r.blob();
+        const a=document.createElement("a");
+        a.href=URL.createObjectURL(blob);
+        const base=(vtitle.textContent||"video").replace(/[^\w.-]+/g,"_");
+        a.download=`${base}.${fmt.value}`;
+        document.body.appendChild(a);a.click();a.remove();
+        showToast("Téléchargement terminé ✔",true);
+      }catch(err){
+        showToast("Erreur de téléchargement",false);
+        alert("Erreur : "+(err.message||"échec"));
+      }finally{
+        loader.textContent="⏳ Chargement des infos…";loader.style.display="none";
+      }
+    };
+
+    if(urlInput.value.trim())fetchInfo();
+  </script>
+</body>
+</html>
