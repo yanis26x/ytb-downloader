@@ -1,18 +1,11 @@
 # ytb-downloader
 A minimalist and fast YouTube downloader that lets you save videos or audio in MP4 or MP3 with just one click.
-#
-https://youtu.be/lburLa0qYhI?si=5L_SC8wbktCL_pRi
+### Demo
+[Voir la démo sur YouTube](https://youtu.be/lburLa0qYhI?si=5L_SC8wbktCL_pRi)
+
 #
 ![screenshot](https://github.com/yanis26x/ytb-downloader/blob/main/Screenshot.png)
-#
-```bash
-npm init -y
-
-npm i express cors nanoid
-```
-
 ## Licence
-
 Ce projet est sous licence **Creative Commons Attribution - Pas d’Utilisation Commerciale 4.0 International (CC BY-NC 4.0)**.  
 Vous pouvez le consulter, le partager et le modifier, **tant que vous créditez l’auteur (yanis26x)** et que **vous n’en faites pas un usage commercial**.  
 
